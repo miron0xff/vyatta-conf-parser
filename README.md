@@ -1,4 +1,6 @@
-vyatta-conf-parser
-==================
+Python Vyatta config parser
+===========================
 
-Vyatta config parser in pure python. Inspired by vyosparser of pyatta project.
+Vyatta config parser with unicode support and without dependencies.
+
+Inspired by vyosparser of pyatta project (https://github.com/abessifi/pyatta).
