@@ -7,7 +7,7 @@ except ImportError:
 import vyattaconfparser
 
 setup(
-    name='Vyatta Config Parser',
+    name='VyattaConfParser',
     version=vyattaconfparser.__version__,
     packages=['vyattaconfparser'],
     url='https://github.com/hedin/vyatta-conf-parser',
@@ -23,7 +23,7 @@ setup(
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Development Status :: 3'
+        'Development Status :: 3 - Alpha'
     ),
     description='A python config parser for Vyatta',
 )
