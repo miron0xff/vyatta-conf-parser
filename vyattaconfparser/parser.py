@@ -1,7 +1,6 @@
 # coding:utf-8
 import re
 import sys
-from collections import defaultdict
 
 if sys.version < '3':
     def u(x):
@@ -13,7 +12,7 @@ else:
         return x
 
 rxh = re.compile(r'^([\w\-]+) \{$', re.UNICODE)
-rxl = re.compile(r'^([\w\-]+) ([\w\-\"\./]+) \{$', re.UNICODE)
+rxl = re.compile(r'^([\w\-]+) ([\w\-\"\./@]+) \{$', re.UNICODE)
 rxv = re.compile(r'^([\w\-]+) ([\w\-\"\.,/:@\*»« ]+)$', re.UNICODE)
 rxu = re.compile(r'^([\w\-]+)$', re.UNICODE)
 
@@ -22,13 +21,11 @@ class ParserException(Exception):
     pass
 
 
-def tree():
-    return defaultdict(tree)
-
-
 def update_tree(config, path, val):
     t = config
     for n, i in enumerate(path):
+        if i.keys()[0] not in t:
+            t[i.keys()[0]] = {}
         t = t[list(i.keys())[0]]
     if isinstance(t, dict):
         if isinstance(val, dict):
@@ -47,17 +44,13 @@ def update_tree(config, path, val):
     return config
 
 
-def parse_node(config, raw, headers=None, i=0):
+def parse_node(config, line, headers=None):
     if not headers:
         headers = []
 
-    try:
-        line = raw[i]
-        line = line.strip()
-        if not line:
-            return config
-    except IndexError:
-        return config
+    line = line.strip()
+    if not line:
+        return config, headers
 
     if rxh.match(line):
         h = rxh.match(line).groups()[0]
@@ -86,15 +79,17 @@ def parse_node(config, raw, headers=None, i=0):
             headers.pop()
 
     else:
-        raise ParserException('Parse error: "%s", Line: %d' % (line, i))
+        raise ParserException('Parse error: "%s"' % line)
 
-    parse_node(config, raw, headers, i + 1)
+    return config, headers
 
 
-def parse_conf(string):
-    if string:
-        string = u(string).split('\n')
-        c = tree()
-        parse_node(c, string)
+def parse_conf(s):
+    if s:
+        s = u(s).split('\n')
+        c = {}
+        headers = []
+        for line in s:
+            c, headers = parse_node(c, line, headers)
         return c
     raise ParserException('Empty config passed')
