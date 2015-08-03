@@ -13,7 +13,7 @@ else:
 
 rxh = re.compile(r'^([\w\-]+) \{$', re.UNICODE)
 rxl = re.compile(r'^([\w\-]+) ([\w\-\"\./@]+) \{$', re.UNICODE)
-rxv = re.compile(r'^([\w\-]+) ([\w\-\"\.,/:@\*»« ]+)$', re.UNICODE)
+rxv = re.compile(r'^([\w\-]+) "?([^"]+)"?$', re.UNICODE)
 rxu = re.compile(r'^([\w\-]+)$', re.UNICODE)
 
 
