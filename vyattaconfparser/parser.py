@@ -13,9 +13,9 @@ else:
 
 rxh = re.compile(r'^([\w\-]+) \{$', re.UNICODE)
 rxl = re.compile(r'^([\w\-]+) ([\w\-\"\./@]+) \{$', re.UNICODE)
-rxv = re.compile(r'^([\w\-]+) "?([^"]+)"?$', re.UNICODE)
+rxv = re.compile(r'^([\w\-]+) "?([^"]+)?"?$', re.UNICODE)
 rxu = re.compile(r'^([\w\-]+)$', re.UNICODE)
-
+rxz = re.compile(r'^(\/\*).*(\*\/)', re.UNICODE)
 
 class ParserException(Exception):
     pass
@@ -71,6 +71,9 @@ def parse_node(config, line, headers=None):
     elif rxu.match(line):
         kv = rxu.match(line).group()
         update_tree(config, headers, {kv: kv})
+
+    elif rxz.match(line):
+        pass
 
     elif line == '}' and headers:
         hq = [list(h.values())[0] for h in headers]
