@@ -7,6 +7,7 @@ from datadiff.tools import assert_equal
 
 import vyattaconfparser as vparser
 
+
 class TestBackupOspfRoutesEdgemax(unittest.TestCase):        
     def test_basic_parse_works_a1(self, dos_line_endings=False):
         s = """interfaces {
@@ -82,18 +83,64 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
              }
         }"""
         correct = {
-          'interfaces': {
-            'ethernet': {
-              'eth0': {
-                'description': 'eth0-upstream #302.5-19a (temp path)',
-                 'duplex': 'auto',
-                 'speed': 'auto'
-              }
+            'interfaces': {
+                'ethernet': {
+                    'eth0': {
+                        'description': 'eth0-upstream #302.5-19a (temp path)',
+                        'duplex': 'auto',
+                        'speed': 'auto'
+                    }
+                }
             }
-          }
         }
         rv = vparser.parse_conf(s)
         assert isinstance(rv, dict) 
+        assert_equal(rv, correct)
+
+    def test_parsing_bgp_ipv6_works(self):
+        s = """protocols {
+            bgp 1 {
+                address-family {
+                    ipv6-unicast {
+                        network 2001:2000:6000::/40 {
+                        }
+                        network 2001:2060::/32 {
+                        }
+                    }
+                }
+                neighbor 10.10.1.2 {
+                    remote-as 2
+                }
+                network 192.168.1.0/24 {
+                }
+            }
+        }"""
+        correct = {
+            'protocols': {
+                'bgp': {
+                    '1': {
+                        'address-family': {
+                            'ipv6-unicast': {
+                                'network': {
+                                    '2001:2000:6000::/40': {},
+                                    '2001:2060::/32': {}
+                                }
+                            }
+                        },
+                        'neighbor': {
+                            '10.10.1.2': {
+                                'remote-as': '2'
+                            }
+                        },
+                        'network': {
+                            '192.168.1.0/24': {}
+                        }
+                    }
+                }
+            }
+        }
+        rv = vparser.parse_conf(s)
+        assert isinstance(rv, dict)
         assert_equal(rv, correct)
 
     ## Future comment parsing (using '_comment' key -- parsed obj format not yet selected).
