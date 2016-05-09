@@ -25,8 +25,8 @@ class ParserException(Exception):
 def update_tree(config, path, val):
     t = config
     for n, i in enumerate(path):
-        if i.keys()[0] not in t:
-            t[i.keys()[0]] = {}
+        if list(i.keys())[0] not in t:
+            t[list(i.keys())[0]] = {}
         t = t[list(i.keys())[0]]
     if isinstance(t, dict):
         if isinstance(val, dict):
