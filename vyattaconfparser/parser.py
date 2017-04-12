@@ -11,11 +11,16 @@ else:
     def u(x):
         return x
 
-rx_section = re.compile(r'^([\w\-]+) \{$', re.UNICODE)  # Matches section start `interfaces {`
-rx_dict = re.compile(r'^([\w\-]+) ([\w\-\"\./@:]+) \{$', re.UNICODE)  # Matches named section `ethernet eth0 {`
-rx_value = re.compile(r'^([\w\-]+) "?([^"]+)?"?$', re.UNICODE)  # Matches simple key-value pair `duplex auto`
-rx_flag = re.compile(r'^([\w\-]+)$', re.UNICODE)  # Matches single value (flag) `disable`
-rx_comment = re.compile(r'^(\/\*).*(\*\/)', re.UNICODE)  # Matches comments
+# Matches section start `interfaces {`
+rx_section = re.compile(r'^([\w\-]+) \{$', re.UNICODE)
+# Matches named section `ethernet eth0 {`
+rx_dict = re.compile(r'^([\w\-]+) ([\w\-\"\./@:]+) \{$', re.UNICODE)
+# Matches simple key-value pair `duplex auto`
+rx_value = re.compile(r'^([\w\-]+) "?([^"]+)?"?$', re.UNICODE)
+# Matches single value (flag) `disable`
+rx_flag = re.compile(r'^([\w\-]+)$', re.UNICODE)
+# Matches comments
+rx_comment = re.compile(r'^(\/\*).*(\*\/)', re.UNICODE)
 
 
 class ParserException(Exception):
@@ -26,23 +31,30 @@ def update_tree(config, path, val, val_type=None):
     t = config
 
     for item in path:
-        if item.keys()[0] not in t:
+        if list(item.keys())[0] not in t:
             try:
-                t[item.keys()[0]] = {}
+                t[list(item.keys())[0]] = {}
             except TypeError:
                 break
 
-        t = t.get(item.keys()[0])
+        t = t.get(list(item.keys())[0])
 
     if val_type == 'flag':
         t.update(val)
 
     elif val_type == 'value':
         if t and isinstance(t, dict):
-            if t.keys()[0] == val.keys()[0]:
-                t.update({t.keys()[0]: dict([(k, {}) for k in t.values() + val.values()])})
-            elif val.keys()[0] == path[-1].keys()[0]:
-                t.update({val.values()[0]: {}})
+            if list(t.keys())[0] == list(val.keys())[0]:
+                try:
+                    t.update({
+                        list(t.keys())[0]: dict(
+                            [(k, {}) for k in list(t.values()) + list(val.values())]
+                        )
+                    })
+                except TypeError:
+                    t[list(t.keys())[0]].update({list(val.values())[0]: {}})
+            elif list(val.keys())[0] == list(path[-1].keys())[0]:
+                t.update({list(val.values())[0]: {}})
             else:
                 t.update(val)
         else:
@@ -94,11 +106,17 @@ def parse_node(config, line, line_num, path=None):
     elif line == '}' and path:
         path_types = [list(p.values())[0] for p in path]
         path.pop()
-        if len(path_types) > 1 and path_types[-2:] == ['section', 'named_section']:
+        if len(path_types) > 1 and path_types[-2:] == ['section',
+                                                       'named_section']:
+            path.pop()
+        elif len(path_types) > 1 and path_types[-2:] == ['named_section',
+                                                         'named_section']:
             path.pop()
 
     else:
-        raise ParserException('Parse error in\n {line_num}: {line}\n'.format(line_num=line_num, line=line))
+        raise ParserException(
+            'Parse error in\n {line_num}: {line}\n'.format(line_num=line_num,
+                                                           line=line))
 
     return config, path
 
