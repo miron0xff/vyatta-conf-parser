@@ -14,7 +14,7 @@ setup(
     author=vyattaconfparser.__author__,
     author_email='a.m.mironov@gmail.com',
     classifiers=(
-        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
@@ -24,7 +24,10 @@ setup(
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Development Status :: 3 - Alpha'
+        'Development Status :: 4 - Beta'
     ),
     description='A python config parser for Vyatta',
+    extras_require={
+        'dev': ['datadiff', ],
+    },
 )
