@@ -182,6 +182,54 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
         assert isinstance(rv, dict)
         assert_equal(correct, rv)
 
+    def test_multiple_values_with_same_key(self):
+        s = """
+        service {
+            ssh {
+                address 0.0.0.0 {
+                    port 22
+                }
+                cipher aes128-cbc
+                cipher aes192-cbc
+                cipher aes256-cbc
+                hmac hmac-md5
+                hmac hmac-md5-96
+                hmac hmac-sha1
+                hmac hmac-sha1-96
+                key-exchange-algo diffie-hellman-group-exchange-sha1
+                key-exchange-algo diffie-hellman-group-exchange-sha256
+            }
+        }
+        """
+        correct = {
+            'service': {
+                'ssh': {
+                    'address': {
+                        '0.0.0.0': {
+                            'port': '22',
+                        }
+                    },
+                    'cipher': {
+                        'aes128-cbc': {},
+                        'aes192-cbc': {},
+                        'aes256-cbc': {},
+                    },
+                    'hmac': {
+                        'hmac-md5': {},
+                        'hmac-md5-96': {},
+                        'hmac-sha1': {},
+                        'hmac-sha1-96': {},
+                    },
+                    'key-exchange-algo': {
+                        'diffie-hellman-group-exchange-sha1': {},
+                        'diffie-hellman-group-exchange-sha256': {},
+                    }
+                }
+            }
+        }
+        rv = vparser.parse_conf(s)
+        assert isinstance(rv, dict)
+        assert_equal(correct, rv)
 
 if __name__ == "__main__":
     unittest.main()

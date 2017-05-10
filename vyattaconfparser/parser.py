@@ -52,9 +52,21 @@ def update_tree(config, path, val, val_type=None):
                         )
                     })
                 except TypeError:
+                    if isinstance(t[list(t.keys())[0]], unicode):
+                        t[list(t.keys())[0]] = {t[list(t.keys())[0]]: {}}
                     t[list(t.keys())[0]].update({list(val.values())[0]: {}})
             elif list(val.keys())[0] == list(path[-1].keys())[0]:
                 t.update({list(val.values())[0]: {}})
+            elif list(val.keys())[0] in list(t.keys()):
+                try:
+                    t.update({
+                        list(val.keys())[0]: {
+                            t[list(val.keys())[0]]: {},
+                            list(val.values())[0]: {},
+                        }
+                    })
+                except TypeError:
+                    t[list(val.keys())[0]].update({list(val.values())[0]: {}})
             else:
                 t.update(val)
         else:
