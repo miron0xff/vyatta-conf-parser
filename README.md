@@ -1,7 +1,7 @@
-Python Vyatta config parser
+Vyatta/VyOS config parser
 ===========================
 
-Vyatta config parser with unicode support and without dependencies.
+Vyatta/VyOS config parser with unicode support and without dependencies.
 
 Inspired by vyosparser of pyatta project (https://github.com/abessifi/pyatta).
 
