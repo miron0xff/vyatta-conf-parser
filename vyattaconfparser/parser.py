@@ -101,6 +101,8 @@ def parse_node(config, line, line_num, path=None):
         section, name = rx_dict.match(line).groups()
         if section not in [list(p.keys())[0] for p in path]:
             path.append({section: val_type})
+        elif section != [list(p.keys())[0] for p in path][-1]:
+            path.append({section: val_type})
         path.append({name: val_type})
         update_tree(config, path, {section: {name: {}}}, val_type=val_type)
 
@@ -127,8 +129,11 @@ def parse_node(config, line, line_num, path=None):
 
     else:
         raise ParserException(
-            'Parse error in\n {line_num}: {line}\n'.format(line_num=line_num,
-                                                           line=line))
+            'Parse error at {line_num}: {line}'.format(
+                line_num=line_num,
+                line=line
+            )
+        )
 
     return config, path
 

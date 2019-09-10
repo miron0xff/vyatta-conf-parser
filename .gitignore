@@ -105,3 +105,10 @@ com_crashlytics_export_strings.xml
 
 # PyENV
 .python-version
+
+# PipENV
+Pipfile
+Pipfile.lock
+
+# VSCode
+.vscode

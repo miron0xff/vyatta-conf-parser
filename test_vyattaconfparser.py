@@ -231,5 +231,58 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
         assert isinstance(rv, dict)
         assert_equal(correct, rv)
 
+    def test_service_dyndns(self):
+        s = """
+        service {
+            dns {
+                dynamic {
+                    interface pppoe0 {
+                        service dyndns {
+                            host-name example.com
+                            login exampleuser
+                            password ****
+                            server dyn.dns.he.net
+                        }
+                    }
+                }
+                forwarding {
+                    cache-size 1000
+                    listen-on switch0
+                    name-server 1.1.1.1
+                    system
+                }
+            }
+        }
+        """
+        correct = {
+            'service': {
+                'dns': {
+                    'dynamic': {
+                        'interface': {
+                            'pppoe0': {
+                                'service': {
+                                    'dyndns': {
+                                        'host-name': 'example.com',
+                                        'login': 'exampleuser',
+                                        'password': '****',
+                                        'server': 'dyn.dns.he.net',
+                                    }
+                                }
+                            },
+                        }
+                    },
+                    'forwarding': {
+                        'cache-size': '1000',
+                        'listen-on': 'switch0',
+                        'name-server': '1.1.1.1',
+                        'system': 'system',
+                    }
+                }
+            }
+        }
+        rv = vparser.parse_conf(s)
+        assert isinstance(rv, dict)
+        assert_equal(correct, rv)
+
 if __name__ == "__main__":
     unittest.main()
