@@ -14,7 +14,7 @@ else:
 # Matches section start `interfaces {`
 rx_section = re.compile(r'^([\w\-]+) \{$', re.UNICODE)
 # Matches named section `ethernet eth0 {`
-rx_dict = re.compile(r'^([\w\-]+) ([\w\-\"\./@:]+) \{$', re.UNICODE)
+rx_named_section = re.compile(r'^([\w\-]+) ([\w\-\"\./@:]+) \{$', re.UNICODE)
 # Matches simple key-value pair `duplex auto`
 rx_value = re.compile(r'^([\w\-]+) "?([^"]+)?"?$', re.UNICODE)
 # Matches single value (flag) `disable`
@@ -70,7 +70,26 @@ def update_tree(config, path, val, val_type=None):
             else:
                 t.update(val)
         else:
-            t.update(val)
+            if isinstance(t, str):
+                prev_keys = list(
+                    map(lambda x: list(x.keys())[0], path)
+                )[:-1]
+                prev_section_key = prev_keys[-1]
+
+                if len(prev_keys) == 1:
+                    config[prev_section_key] = {config[prev_section_key]: {}}
+                    t = config[prev_section_key]
+                else:
+                    t = config
+                    for k in prev_keys[:-1]:
+                        t = t[k]
+                    t[prev_section_key] = {t[prev_section_key]: {}}
+                    t = t[prev_section_key]
+
+                t.update({list(item.keys())[0]: val})
+
+            else:
+                t.update(val)
 
     elif val_type == 'named_section':
         pass
@@ -96,9 +115,9 @@ def parse_node(config, line, line_num, path=None):
         if path:
             update_tree(config, path, {section: {}}, val_type=val_type)
 
-    elif rx_dict.match(line):
+    elif rx_named_section.match(line):
         val_type = 'named_section'
-        section, name = rx_dict.match(line).groups()
+        section, name = rx_named_section.match(line).groups()
         if section not in [list(p.keys())[0] for p in path]:
             path.append({section: val_type})
         elif section != [list(p.keys())[0] for p in path][-1]:

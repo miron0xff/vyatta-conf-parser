@@ -231,7 +231,7 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
         assert isinstance(rv, dict)
         assert_equal(correct, rv)
 
-    def test_service_dyndns(self):
+    def test_same_sub_key(self):
         s = """
         service {
             dns {
@@ -244,12 +244,6 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
                             server dyn.dns.he.net
                         }
                     }
-                }
-                forwarding {
-                    cache-size 1000
-                    listen-on switch0
-                    name-server 1.1.1.1
-                    system
                 }
             }
         }
@@ -271,12 +265,55 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
                             },
                         }
                     },
-                    'forwarding': {
-                        'cache-size': '1000',
-                        'listen-on': 'switch0',
-                        'name-server': '1.1.1.1',
-                        'system': 'system',
+                }
+            }
+        }
+        rv = vparser.parse_conf(s)
+        assert isinstance(rv, dict)
+        assert_equal(correct, rv)
+
+    def test_named_section_without_curly_braces(self):
+        s = """
+        vti vti10
+        vti vti11 {
+            address 1.1.1.1/28
+            description Tunnel number 1
+            test_named_no_curly 1
+            test_named_no_curly 2 {
+                some_key value
+                even deeper1
+                even deeper2 {
+                    another_key value
+                }
+            }
+        }
+        vti vti12 {
+            address 2.2.2.2/28
+            description Tunnel number 2
+        }
+        """
+        correct = {
+            'vti': {
+                'vti10': {},
+                'vti11': {
+                    'address': '1.1.1.1/28',
+                    'description': 'Tunnel number 1',
+                    'test_named_no_curly': {
+                        '1': {},
+                        '2': {
+                            'some_key': 'value',
+                            'even': {
+                                'deeper1': {},
+                                'deeper2': {
+                                    'another_key': 'value',
+                                }
+                            }
+                        }
                     }
+                },
+                'vti12': {
+                    'address': '2.2.2.2/28',
+                    'description': 'Tunnel number 2',
                 }
             }
         }
