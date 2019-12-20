@@ -3,18 +3,24 @@ import re
 import sys
 
 if sys.version < '3':
+
     def u(x):
         return x.decode('utf-8')
+
+
 else:
     unicode = str
 
     def u(x):
         return x
 
+
 # Matches section start `interfaces {`
 rx_section = re.compile(r'^([\w\-]+) \{$', re.UNICODE)
 # Matches named section `ethernet eth0 {`
-rx_named_section = re.compile(r'^([\w\-]+) ([\w\-\"\./@:=\+]+) \{$', re.UNICODE)
+rx_named_section = re.compile(
+    r'^([\w\-]+) ([\w\-\"\./@:=\+]+) \{$', re.UNICODE
+)
 # Matches simple key-value pair `duplex auto`
 rx_value = re.compile(r'^([\w\-]+) "?([^"]+)?"?$', re.UNICODE)
 # Matches single value (flag) `disable`
@@ -46,11 +52,17 @@ def update_tree(config, path, val, val_type=None):
         if t and isinstance(t, dict):
             if list(t.keys())[0] == list(val.keys())[0]:
                 try:
-                    t.update({
-                        list(t.keys())[0]: dict(
-                            [(k, {}) for k in list(t.values()) + list(val.values())]
-                        )
-                    })
+                    t.update(
+                        {
+                            list(t.keys())[0]: dict(
+                                [
+                                    (k, {})
+                                    for k in list(t.values())
+                                    + list(val.values())
+                                ]
+                            )
+                        }
+                    )
                 except TypeError:
                     if isinstance(t[list(t.keys())[0]], unicode):
                         t[list(t.keys())[0]] = {t[list(t.keys())[0]]: {}}
@@ -59,21 +71,21 @@ def update_tree(config, path, val, val_type=None):
                 t.update({list(val.values())[0]: {}})
             elif list(val.keys())[0] in list(t.keys()):
                 try:
-                    t.update({
-                        list(val.keys())[0]: {
-                            t[list(val.keys())[0]]: {},
-                            list(val.values())[0]: {},
+                    t.update(
+                        {
+                            list(val.keys())[0]: {
+                                t[list(val.keys())[0]]: {},
+                                list(val.values())[0]: {},
+                            }
                         }
-                    })
+                    )
                 except TypeError:
                     t[list(val.keys())[0]].update({list(val.values())[0]: {}})
             else:
                 t.update(val)
         else:
             if isinstance(t, str):
-                prev_keys = list(
-                    map(lambda x: list(x.keys())[0], path)
-                )[:-1]
+                prev_keys = list(map(lambda x: list(x.keys())[0], path))[:-1]
                 prev_section_key = prev_keys[-1]
 
                 if len(prev_keys) == 1:
@@ -139,18 +151,21 @@ def parse_node(config, line, line_num, path=None):
     elif line == '}' and path:
         path_types = [list(p.values())[0] for p in path]
         path.pop()
-        if len(path_types) > 1 and path_types[-2:] == ['section',
-                                                       'named_section']:
+        if len(path_types) > 1 and path_types[-2:] == [
+            'section',
+            'named_section',
+        ]:
             path.pop()
-        elif len(path_types) > 1 and path_types[-2:] == ['named_section',
-                                                         'named_section']:
+        elif len(path_types) > 1 and path_types[-2:] == [
+            'named_section',
+            'named_section',
+        ]:
             path.pop()
 
     else:
         raise ParserException(
             'Parse error at {line_num}: {line}'.format(
-                line_num=line_num,
-                line=line
+                line_num=line_num, line=line
             )
         )
 
