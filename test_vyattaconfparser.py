@@ -231,7 +231,7 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
         assert isinstance(rv, dict)
         assert_equal(correct, rv)
 
-    def test_same_sub_key(self):
+    def test_nested_keys_with_same_names(self):
         s = """
         service {
             dns {
@@ -320,6 +320,46 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
         rv = vparser.parse_conf(s)
         assert isinstance(rv, dict)
         assert_equal(correct, rv)
+
+    def test_wireguard_syntax(self):
+        s = """
+        wireguard wg0 {
+            address 10.200.200.1/24
+            listen-port 60000
+            mtu 1420
+            peer XXXX= {
+                allowed-ips 10.200.200.3/32
+            }
+            peer YYYY= {
+                allowed-ips 10.200.200.2/32
+            }
+            private-key ****************
+            route-allowed-ips true
+        }
+        """
+        correct = {
+            'wireguard': {
+                'wg0': {
+                    'address': '10.200.200.1/24',
+                    'listen-port': '60000',
+                    'mtu': '1420',
+                    'peer': {
+                        'XXXX=': {
+                            'allowed-ips': '10.200.200.3/32',
+                        },
+                        'YYYY=': {
+                            'allowed-ips': '10.200.200.2/32',
+                        }
+                    },
+                    'private-key': '****************',
+                    'route-allowed-ips': 'true'
+                }
+            }
+        }
+        rv = vparser.parse_conf(s)
+        assert isinstance(rv, dict)
+        assert_equal(correct, rv)
+
 
 if __name__ == "__main__":
     unittest.main()
