@@ -336,6 +336,9 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
             peer YYYY= {
                 allowed-ips 10.200.200.2/32
             }
+            peer ZZ+Z= {
+                allowed-ips 10.200.200.1/32
+            }
             private-key ****************
             route-allowed-ips true
         }
@@ -352,6 +355,9 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
                         },
                         'YYYY=': {
                             'allowed-ips': '10.200.200.2/32',
+                        },
+                        'ZZ+Z=': {
+                            'allowed-ips': '10.200.200.1/32',
                         }
                     },
                     'private-key': '****************',

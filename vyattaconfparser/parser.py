@@ -14,7 +14,7 @@ else:
 # Matches section start `interfaces {`
 rx_section = re.compile(r'^([\w\-]+) \{$', re.UNICODE)
 # Matches named section `ethernet eth0 {`
-rx_named_section = re.compile(r'^([\w\-]+) ([\w\-\"\./@:=]+) \{$', re.UNICODE)
+rx_named_section = re.compile(r'^([\w\-]+) ([\w\-\"\./@:=\+]+) \{$', re.UNICODE)
 # Matches simple key-value pair `duplex auto`
 rx_value = re.compile(r'^([\w\-]+) "?([^"]+)?"?$', re.UNICODE)
 # Matches single value (flag) `disable`
