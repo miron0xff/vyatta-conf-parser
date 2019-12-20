@@ -30,7 +30,10 @@ class TestBackupOspfRoutesEdgemax(unittest.TestCase):
             'interfaces': {
                 'ethernet': {
                     'eth0': {
-                        'address': {'192.168.0.2/24': {}, '192.168.1.2/24': {}},
+                        'address': {
+                            '192.168.0.2/24': {},
+                            '192.168.1.2/24': {}
+                        },
                         'description': 'eth0-upstream',
                         'duplex': 'auto',
                         'speed': 'auto',
